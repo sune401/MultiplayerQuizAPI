@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MultiplayerQuizAPI.DB;
 using MultiplayerQuizAPI.Services;
 using System.Text;
 
@@ -76,6 +77,12 @@ builder.Services.AddSwaggerGen();
 
 // Build app
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
 
 
 // Swagger
