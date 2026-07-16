@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerQuizAPI.models;
+using MultiplayerQuizAPI.Services;
 using LoginRequest = MultiplayerQuizAPI.models.LoginRequest;
 
 namespace MultiplayerQuizAPI.Controllers
@@ -9,22 +10,28 @@ namespace MultiplayerQuizAPI.Controllers
     [Route("[controller]")]
     public class LoginController : ControllerBase
     {
-        [HttpPost]
-        public LoginResponse login([FromBody] LoginRequest loginRequest)
+        private readonly TokenService _tokenService;
+        
+        public LoginController(TokenService tokenService)
         {
-            Console.WriteLine($"Username: {loginRequest.username}, Password: {loginRequest.password}");
+            _tokenService = tokenService;
+        }
 
-            var response = new LoginResponse();
-            response.username = loginRequest.username;
-            response.success = true;
-            response.token = "dmdlkmndvlndvxnvvnfjfdbf";
-
-            if (loginRequest.username == "admin" && loginRequest.password == "1234")
+        [HttpPost]
+        public IActionResult login([FromBody] LoginRequest loginRequest)
+        {
+            if(loginRequest.username == "admin" && loginRequest.password == "1234")
             {
-                return response;
-            }
+                var token = _tokenService.CreateToken(loginRequest.username);
 
-            return null;
+                return Ok(new LoginResponse
+                {
+                    username = loginRequest.username,
+                    token = token,
+                });
+            }
+            return Unauthorized();
+            
         }
     }
 }
