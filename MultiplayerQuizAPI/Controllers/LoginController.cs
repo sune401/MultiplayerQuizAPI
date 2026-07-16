@@ -7,7 +7,7 @@ using LoginRequest = MultiplayerQuizAPI.models.LoginRequest;
 namespace MultiplayerQuizAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[User]")]
     public class LoginController : ControllerBase
     {
         private readonly TokenService _tokenService;
