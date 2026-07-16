@@ -7,7 +7,7 @@ using MultiplayerQuizAPI.models;
 namespace MultiplayerQuizAPI.Controllers
 {
     [ApiController]
-    [Route("[User]")]
+    [Route("[controller]")]
     public class RegisterController : ControllerBase
     {
         private readonly AppDbContext _context;
