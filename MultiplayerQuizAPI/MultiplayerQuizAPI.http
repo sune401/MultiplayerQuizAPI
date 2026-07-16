@@ -1,0 +1,6 @@
+@MultiplayerQuizAPI_HostAddress = http://localhost:5243
+
+GET {{MultiplayerQuizAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
