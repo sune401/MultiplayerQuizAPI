@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MultiplayerQuizAPI.DB;
 using MultiplayerQuizAPI.models;
+using RegisterRequest = MultiplayerQuizAPI.models.RegisterRequest;
 
 namespace MultiplayerQuizAPI.Controllers
 {
@@ -22,32 +23,31 @@ namespace MultiplayerQuizAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            var existingUser = await _context.Users
-                .FirstOrDefaultAsync(x => x.email == request.Email);
-
-            if (existingUser != null)
+            if(await _context.Users.AnyAsync(u => u.username == request.username))
             {
-                return BadRequest("User already exists");
+                return BadRequest("Username already exists.");
             }
 
+            if(await _context.Users.AnyAsync(u => u.email == request.email))
+            {
+                return BadRequest("Email already exists.");
+            }
 
             var user = new User
             {
-                username = request.Email,
-                email = request.Email,
-                passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                username = request.username,
+                email = request.email,
+                firstName = request.firstName,
+                lastName = request.lastName,
+                passwordHash = BCrypt.Net.BCrypt.HashPassword(request.password),
+                phoneNumber = request.phoneNumber
+
             };
 
-
             _context.Users.Add(user);
-
             await _context.SaveChangesAsync();
 
-
-            return Ok(new
-            {
-                message = "User created"
-            });
+            return Ok("User registered successfully.");
         }
     }
 }
