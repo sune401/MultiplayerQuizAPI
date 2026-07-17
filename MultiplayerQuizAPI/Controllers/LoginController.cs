@@ -20,13 +20,12 @@ namespace MultiplayerQuizAPI.Controllers
         [HttpPost]
         public IActionResult login([FromBody] LoginRequest loginRequest)
         {
-            if(loginRequest.username == "admin" && loginRequest.password == "1234")
+            if(loginRequest.username == "admin" && loginRequest.passwordHash == "1234")
             {
                 var token = _tokenService.CreateToken(loginRequest.username);
 
                 return Ok(new LoginResponse
                 {
-                    username = loginRequest.username,
                     token = token,
                 });
             }
