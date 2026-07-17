@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MultiplayerQuizAPI.DB;
 using MultiplayerQuizAPI.models;
 using MultiplayerQuizAPI.Services;
+using System.Threading.Tasks;
 using LoginRequest = MultiplayerQuizAPI.models.LoginRequest;
 
 namespace MultiplayerQuizAPI.Controllers
@@ -10,27 +13,35 @@ namespace MultiplayerQuizAPI.Controllers
     [Route("[controller]")]
     public class LoginController : ControllerBase
     {
+        private readonly AppDbContext _context;
+
         private readonly TokenService _tokenService;
         
-        public LoginController(TokenService tokenService)
+        public LoginController(TokenService tokenService, AppDbContext appDbContext)
         {
+            _context = appDbContext;
             _tokenService = tokenService;
         }
 
         [HttpPost]
-        public IActionResult login([FromBody] LoginRequest loginRequest)
+        public async Task<IActionResult> login([FromBody] LoginRequest loginRequest)
         {
-            if(loginRequest.username == "admin" && loginRequest.password == "1234")
-            {
-                var token = _tokenService.CreateToken(loginRequest.username);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.username == loginRequest.username);
 
-                return Ok(new LoginResponse
-                {
-                    token = token,
-                });
+            if(user == null)
+            {
+                return Unauthorized(new { message = "Invalid username or password" });
             }
-            return Unauthorized();
-            
+
+            bool validPassword = BCrypt.Net.BCrypt.Verify(loginRequest.password, user.passwordHash);
+            if(!validPassword)
+            {
+                return Unauthorized(new { message = "Invalid username or password" });
+            }
+
+            var token = _tokenService.CreateToken(user.username);
+            return Ok(new { token = token });
+
         }
     }
 }
