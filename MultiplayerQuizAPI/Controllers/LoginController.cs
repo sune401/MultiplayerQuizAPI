@@ -39,7 +39,7 @@ namespace MultiplayerQuizAPI.Controllers
                 return Unauthorized(new { message = "Invalid username or password" });
             }
 
-            var token = _tokenService.CreateToken(user.username);
+            var token = _tokenService.CreateToken(user);
             return Ok(new { token = token });
 
         }
